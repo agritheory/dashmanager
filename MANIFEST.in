@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include dashmanager *.css
+recursive-include dashmanager *.csv
+recursive-include dashmanager *.html
+recursive-include dashmanager *.ico
+recursive-include dashmanager *.js
+recursive-include dashmanager *.json
+recursive-include dashmanager *.md
+recursive-include dashmanager *.png
+recursive-include dashmanager *.py
+recursive-include dashmanager *.svg
+recursive-include dashmanager *.txt
+recursive-exclude dashmanager *.pyc
