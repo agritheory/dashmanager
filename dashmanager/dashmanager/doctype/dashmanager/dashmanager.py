@@ -53,7 +53,7 @@ class Dashmanager(Document):
 	def load_template(self, component):
 		pass
 		# path to jinja "list" template
-		# component type + dimensions (need templates for list, table, )
+		# component type + dimensions (need templates for list, table, chart, status)
 
 
 @frappe.whitelist()
