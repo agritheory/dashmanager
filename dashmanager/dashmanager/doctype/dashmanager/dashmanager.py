@@ -5,18 +5,17 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from frappe.utils.jinja import validate_template  # probably don't need this method, but likely other jinja utilities
 
 
 class Dashmanager(Document):
+	# validation methods
 	def validate(self):
 		self.make_custom_script()
 
-
-	def run_queries(self):
+	def sql_builder(self):
 		pass
-		# for component in components:
-			# result = frappe.db.sql
-			# if cached
+		#
 
 	def make_custom_script(self):
 		script_name = frappe.db.sql("""
@@ -35,6 +34,35 @@ class Dashmanager(Document):
 				new_script.script = new_script.script + "\n \n frappe.ui.form.on(\"" + self.ref_doctype + script
 				new_script.save()
 
+	# rendering methods
+
+	def build_components(self):
+		dash = []
+		pass
+		# for component in components:
+			# self.run_query(component)
+			# template = self.load_template(component)
+			# dash.append(frappe.scrub(component.title): template)
+		# return dash
+
+	def run_query(self):
+		pass
+		# if within cached datetime period, return cache
+		# else: self.sql_builder
+
+	def load_template(self, component):
+		pass
+		# path to jinja "list" template
+		# component type + dimensions (need templates for list, table, )
+
+
+@frappe.whitelist()
+def get_dashboard(doctype, active_document):
+	frappe.msgprint("dashmanager")
+	dash = frappe.get_doc("Dashmanager", {"doctype": doctype})
+	dash.active_document = active_document
+	return dash.build_components()
+
 
 script = """\", {
 	refresh: frm => {
@@ -50,11 +78,3 @@ script = """\", {
 	}
 });
 """
-
-@frappe.whitelist()
-def get_dashboard(doctype, active_document):
-	frappe.msgprint("dashmanager")
-	# dash = frappe.get_doc("Dashmanager", doctype + "-" + docfield)
-	# dash.active_document = active_document
-	# dash.run_queries()
-	# dash.
