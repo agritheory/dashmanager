@@ -16,7 +16,8 @@ app_license = "MIT"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/dashmanager/css/dashmanager.css"
-# app_include_js = "/assets/dashmanager/js/dashmanager.js"
+app_include_js = "/assets/dashmanager/js/dashmanager.js"
+# app_include_js = "/assets/dashmanager/js/item_custom.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/dashmanager/css/dashmanager.css"
@@ -30,6 +31,9 @@ app_license = "MIT"
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
+# doctype_js = {
+#     "Item" : "public/js/item_custom.js"
+# }
 
 # Home Pages
 # ----------

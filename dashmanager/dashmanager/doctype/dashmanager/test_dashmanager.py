@@ -5,6 +5,10 @@ from __future__ import unicode_literals
 
 import frappe
 import unittest
+import dashmanager
 
 class TestDashmanager(unittest.TestCase):
-	pass
+
+	def test_getDashboardDomponents(self):
+		fields = dashmanager.get_dashboard_components("Item")
+		print (fields)

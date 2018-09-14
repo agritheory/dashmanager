@@ -55,6 +55,74 @@ class Dashmanager(Document):
 		# path to jinja "list" template
 		# component type + dimensions (need templates for list, table, chart, status)
 
+	def build_dashboard_components(self):
+		print("Printing Components")
+		components = []
+		index = 0
+		for component in self.components:
+			components.append({
+				"title": component.component_title,
+				"type": component.component_type,
+				"data": self.getDataForComponent(component.component_type, component, self.ref_doctype, self.ref_docfield),
+				"template":self.getTemplateForComponent(component.component_type, component, self.ref_doctype, self.ref_docfield),
+				"domid":self.ref_docfield+"_"+str(index)
+			})
+			index+=1
+		return components
+	
+	def getTemplateForComponent(self, type, component, ref_doctype, ref_docfield):
+		if type=="Chart":
+			return "barcharttemplate"
+		if type=="Table":
+			return "tabletemplate"
+
+	def getDataForComponent(self, type,component, ref_doctype, ref_docfield):
+		### todo: rendering of data based on type of component.
+		if type=="Chart":
+			return self.getChartData(component, ref_doctype, ref_docfield)
+		
+		if type=="Table":
+			return self.getTableData(component, ref_doctype, ref_docfield)
+	
+	def getChartData(self, component, ref_doctype, ref_docfield):
+		## here the data will come from SQL and not statically
+		return {
+			"data": {
+				"labels": ["12am-3am", "3am-6am", "6am-9am", "9am-12pm","12pm-3pm", "3pm-6pm", "6pm-9pm", "9pm-12am"],
+				"datasets": [
+					{
+						"name": "Some Data", "chartType": 'bar',
+						"values": [25, 40, 30, 35, 8, 52, 17, -4]
+					},
+					{
+						"name": "Another Set", "chartType": 'bar',
+						"values": [25, 50, -10, 15, 18, 32, 27, 14]
+					},
+					{
+						"name": "Yet Another", "chartType": 'line',
+						"values": [15, 20, -3, -15, 58, 12, -17, 37]
+					}],
+				"yMarkers": [{ "label": "Marker", "value": 70,"options": { "labelPos": 'left' }}],
+				"yRegions": [{ "label": "Region", "start": -10, "end": 50,"options": { "labelPos": 'right' }}]
+			},
+			"title": "My Awesome Chart",
+			"type": 'axis-mixed', ##// or 'bar', 'line', 'pie', 'percentage'
+			"height": 300,
+			"colors": ['purple', '#ffa3ef', 'light-blue'],
+		}
+		
+
+	
+	
+	
+	def getTableData(self, component, ref_doctype, ref_docfield):
+		## here the data will come from SQL and not statically
+		return {
+			"columns": ['Name', 'Position', 'Salary'],
+			"data": [['Faris', 'Software Developer', '$1200'],['Manas', 'Software Engineer', '$1400']]
+		}
+
+
 
 @frappe.whitelist()
 def get_dashboard(doctype, active_document):
@@ -63,6 +131,19 @@ def get_dashboard(doctype, active_document):
 	dash.active_document = active_document
 	return dash.build_components()
 
+@frappe.whitelist()
+def get_dashboard_components(doctype):
+	dashs = frappe.get_all("Dashmanager", filters={"ref_doctype": doctype})
+	print ("Got Dashes:"+str(dashs))
+	fields = []
+	for d in dashs:
+		dash = frappe.get_doc("Dashmanager",d)
+		print("Got Dash:", str(dash))
+		fields.append({
+			"ref_docfield":dash.ref_docfield,
+			"components":dash.build_dashboard_components()
+		})
+	return fields
 
 script = """\", {
 	refresh: frm => {
