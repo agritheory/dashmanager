@@ -17,8 +17,10 @@ if (route_type=="Form") {
                 // code snippet
                 console.log (r.message)
                 if (r.message) {
-                    var component_fields = r.message;
-                    render_components (component_fields, route);
+                    // var component_fields = r.message;
+                    // render_components (component_fields, route);
+                    var fieldHtml = r.message;
+                    render_test(fieldHtml, route)
                 }
             }, args: {
                 doctype:route
@@ -31,6 +33,17 @@ if (route_type=="Form") {
     }
 }
 
+
+function render_test(html, doctype) {
+    // just want to see if the chart is getting rendered.
+    console.log("Render Test")
+    frappe.ui.form.on(doctype,{
+        refresh:function(frm) {
+            console.log ("rendering the html")
+            $(frm.fields_dict["testfield"].wrapper).html(html);
+        }
+    })
+}
 // we will not do in this way, but need to put in more structured way.. 
 // this is just to get the feel of the flow
 function render_components(component_fields, doctype) {

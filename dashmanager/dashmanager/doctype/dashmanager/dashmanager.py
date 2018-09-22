@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils.jinja import validate_template  # probably don't need this method, but likely other jinja utilities
-
+import json
 
 class Dashmanager(Document):
 	# validation methods
@@ -143,7 +143,14 @@ def get_dashboard_components(doctype):
 			"ref_docfield":dash.ref_docfield,
 			"components":dash.build_dashboard_components()
 		})
-	return fields
+	## changing this to return the rendered template instead of just json data.
+	##return fields
+
+	## a test... response will go field wise.. 
+	return frappe.render_template("dashmanager/templates/barcharttemplate.html", {
+		"component":fields[0]["components"][0] ,
+		"componentdatajson" : json.dumps(fields[0]["components"][0]["data"])
+	})
 
 script = """\", {
 	refresh: frm => {
