@@ -8,6 +8,106 @@ var route_type = route_info[0];
 var route = route_info[1];
 
 console.log("Dashmanager");
+
+/// fire a call each time this script loads to get all registered docs types fo dash manager so that we have 
+/// a on load hook in form component of respective doc type.
+
+registerDocs()
+
+
+function registerDocs() {
+    console.log ("Getting all doc types")
+    frappe.call({
+        method: "dashmanager.dashmanager.doctype.dashmanager.dashmanager.get_dashmanager_docs",
+        callback: function(r) {
+            console.log ("dashmanager.dashmanager.doctype.dashmanager.dashmanager.get_dashmanager_docs",r.message)
+            if (r.message) {
+                // var component_fields = r.message;
+                // render_components (component_fields, route);
+                refDocs = JSON.parse(r.message.ref_docs)
+                if (refDocs) {
+                    // register onload call back for form of given doc.
+                    registerAllDashDocsForOnLoad(refDocs)
+                }
+            }
+        }, error:function(error) {
+            console.log("Error:",error)
+        }
+    })
+}
+
+function registerAllDashDocsForOnLoad(refDocs) {
+    for (refDoc in  refDocs) {
+      registerDashDocForOnLoad(refDocs[refDoc])  
+    }
+}
+function registerDashDocForOnLoad(refDoc) {
+    console.log("Registerign for:", refDoc)
+    frappe.ui.form.on(refDoc,{
+        onload:onLoadHandlerForDashDocForm
+    });
+}
+
+function onLoadHandlerForDashDocForm(frm) {
+    console.log("Loaded Frm", frm);
+    frappe.run_serially([
+        ()=>{
+            return getRegisteredFieldsAndComponentsForDashDocType(frm.doctype)
+        },
+        (data)=>{
+            var fields_components = {}
+            if (data && data.fields && data.fields_components){
+                fields_components = {
+                    fields:JSON.parse(data.fields),
+                    components:JSON.parse(data.fields_components)
+                }
+                return fields_components
+            }else {
+                throw "Error"
+            }
+            
+        }
+    ]).then(fields_components=>{
+        return renderFields(fields_components, frm)
+    }, error=>{
+        console.log ("Dashmanager error: ",error)
+    })
+
+}
+
+function renderFields(fields_components, frm) {
+    return frappe.run_serially([
+        ()=>{
+            // TODO:
+            console.log("Rendering for :", frm.doctype)
+            console.log("The components", fields_components)
+        }
+    ]);
+}
+
+function getRegisteredFieldsAndComponentsForDashDocType(doctype){
+    return frappe.run_serially([
+        () => {
+            return frappe.call({
+                method: "dashmanager.dashmanager.doctype.dashmanager.dashmanager.get_dashmanager_field_components",
+                args: {
+                    doctype:doctype
+                }, error:function(error) {
+                    console.log("Error:",error)
+                }
+            })
+        }]).then (r=>{
+            console.log("Callback,", r)
+            // console.log (r.message)
+            if (r.message) {
+                return r.message
+            }
+        }, error=>{
+            console.log("error", error)
+
+        })
+}
+
 if (route_type=="Form") {
     if (route) {
         console.log ("Fetching Data and components for: ", route)
@@ -38,7 +138,7 @@ function render_test(html, doctype) {
     // just want to see if the chart is getting rendered.
     console.log("Render Test")
     frappe.ui.form.on(doctype,{
-        refresh:function(frm) {
+        onload:function(frm) {
             console.log ("rendering the html")
             $(frm.fields_dict["testfield"].wrapper).html(html);
         }

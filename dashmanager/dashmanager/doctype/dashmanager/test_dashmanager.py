@@ -10,5 +10,6 @@ import dashmanager
 class TestDashmanager(unittest.TestCase):
 
 	def test_getDashboardDomponents(self):
-		fields = dashmanager.get_dashboard_components("Item")
+		#fields = dashmanager.get_dashboard_components("Item")
+		fields = dashmanager.get_dashmanager_field_components("Item")
 		print (fields)

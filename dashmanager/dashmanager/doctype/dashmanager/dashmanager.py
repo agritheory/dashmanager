@@ -147,10 +147,59 @@ def get_dashboard_components(doctype):
 	##return fields
 
 	## a test... response will go field wise.. 
-	return frappe.render_template("dashmanager/templates/barcharttemplate.html", {
-		"component":fields[0]["components"][0] ,
-		"componentdatajson" : json.dumps(fields[0]["components"][0]["data"])
-	})
+	return ""
+	# # frappe.render_template("dashmanager/templates/barcharttemplate.html", {
+	# 	"component":fields[0]["components"][0] ,
+	# 	"componentdatajson" : json.dumps(fields[0]["components"][0]["data"])
+	# })
+
+@frappe.whitelist()
+def get_dashmanager_docs():
+	#### this should return all the documents for which the dashmanager has a registered component.
+	
+	## getting all doctypes from all dashmanagers
+	ref_docs = get_registered_docs_for_dashmanager()
+	
+	return {
+		"ref_docs" : json.dumps(ref_docs)
+	}
+
+def get_registered_docs_for_dashmanager():
+	dash_docs = frappe.get_all("Dashmanager", filters={},fields=["ref_doctype"])	
+	ref_docs = []
+	for dash_doc in dash_docs:
+		if not dash_doc.ref_doctype in ref_docs:
+			ref_docs.append(str(dash_doc.ref_doctype))
+	return ref_docs
+
+@frappe.whitelist()
+def get_dashmanager_field_components(doctype):
+	## get list of fields and components for given doc type
+	fields_list, fields_component_list = get_fields_component_list(doctype)
+	return {
+		"fields" : json.dumps(fields_list),
+		"fields_components" : json.dumps(fields_component_list)
+	}
+
+def get_fields_component_list(doctype):
+	dashs = frappe.get_all("Dashmanager", filters={"ref_doctype": doctype})
+	fields_list = []
+	fields_component_list = {}
+	for dash in dashs:
+		dash_doc = frappe.get_doc("Dashmanager", dash)
+		field = str(dash_doc.ref_docfield).split("-")[1]
+		fields_list.append(field)
+		filtered_components = []
+		for c in dash_doc.components:
+			component = {
+				"component_title":c.component_title,
+				"component_type":c.component_type
+			}
+			filtered_components.append(component)
+		
+		fields_component_list[field] =  filtered_components
+	
+	return fields_list, fields_component_list
 
 script = """\", {
 	refresh: frm => {
