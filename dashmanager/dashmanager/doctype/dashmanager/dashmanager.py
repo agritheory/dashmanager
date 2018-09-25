@@ -12,6 +12,12 @@ class Dashmanager(Document):
 	# validation methods
 	def validate(self):
 		self.make_custom_script()
+		self.validate_duplicates()
+	
+	def validate_duplicates(self):
+		existing_docs = frappe.get_all("Dashmanager", filters={"ref_doctype":self.ref_doctype, "ref_docfield":self.ref_docfield})
+		if len (existing_docs) > 0:
+			frappe.throw("Cannot have Two Dashmanagers for same DocType and Custom Field")
 
 	def sql_builder(self):
 		pass
@@ -59,22 +65,40 @@ class Dashmanager(Document):
 		print("Printing Components")
 		components = []
 		index = 0
+		rendered_htmls = []
+		
 		for component in self.components:
-			components.append({
+			component_obj = {
 				"title": component.component_title,
 				"type": component.component_type,
 				"data": self.getDataForComponent(component.component_type, component, self.ref_doctype, self.ref_docfield),
-				"template":self.getTemplateForComponent(component.component_type, component, self.ref_doctype, self.ref_docfield),
 				"domid":self.ref_docfield+"_"+str(index)
-			})
+			} ## some fields may not be required. Will remove in future
+
+			
+			rendered_htmls.append(
+				frappe.render_template("dashmanager/templates/barcharttemplate.html", {
+				"component":component_obj ,
+				"componentdatajson" : json.dumps(component_obj["data"])
+				})
+			)
+			
+			# components.append({
+			# 	"title": component.component_title,
+			# 	"type": component.component_type,
+			# 	"data": self.getDataForComponent(component.component_type, component, self.ref_doctype, self.ref_docfield),
+			# 	"template":self.getTemplateForComponent(component.component_type, component, self.ref_doctype, self.ref_docfield),
+			# 	"domid":self.ref_docfield+"_"+str(index)
+			# })
 			index+=1
-		return components
+
+		return "".join(rendered_htmls)#components
 	
 	def getTemplateForComponent(self, type, component, ref_doctype, ref_docfield):
 		if type=="Chart":
-			return "barcharttemplate"
+			return "dashmanager/templates/barcharttemplate.html"
 		if type=="Table":
-			return "tabletemplate"
+			return "dashmanager/templates/tabletemplate.html"
 
 	def getDataForComponent(self, type,component, ref_doctype, ref_docfield):
 		### todo: rendering of data based on type of component.
@@ -132,22 +156,17 @@ def get_dashboard(doctype, active_document):
 	return dash.build_components()
 
 @frappe.whitelist()
-def get_dashboard_components(doctype):
-	dashs = frappe.get_all("Dashmanager", filters={"ref_doctype": doctype})
-	print ("Got Dashes:"+str(dashs))
-	fields = []
-	for d in dashs:
-		dash = frappe.get_doc("Dashmanager",d)
-		print("Got Dash:", str(dash))
-		fields.append({
-			"ref_docfield":dash.ref_docfield,
-			"components":dash.build_dashboard_components()
-		})
+def get_dashboard_components(doctype, field):
+	dashs = frappe.get_all("Dashmanager", filters={"ref_doctype": doctype,"ref_docfield":doctype+"-"+field})
+	## for a given dashboard and fields, there will be a single dashmanager record.
+	print("Dashs:",dashs)
+	dash = frappe.get_doc("Dashmanager", dashs[0])
+	return dash.build_dashboard_components()
 	## changing this to return the rendered template instead of just json data.
-	##return fields
+	## return fields
 
 	## a test... response will go field wise.. 
-	return ""
+	##return ""
 	# # frappe.render_template("dashmanager/templates/barcharttemplate.html", {
 	# 	"component":fields[0]["components"][0] ,
 	# 	"componentdatajson" : json.dumps(fields[0]["components"][0]["data"])

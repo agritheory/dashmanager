@@ -30,8 +30,6 @@ function registerDocs() {
                     registerAllDashDocsForOnLoad(refDocs)
                 }
             }
-        }, error:function(error) {
-            console.log("Error:",error)
         }
     })
 }
@@ -63,7 +61,7 @@ function onLoadHandlerForDashDocForm(frm) {
                 }
                 return fields_components
             }else {
-                throw "Error"
+                throw "Cannot fetch Dashmanager Data"
             }
             
         }
@@ -71,6 +69,7 @@ function onLoadHandlerForDashDocForm(frm) {
         return renderFields(fields_components, frm)
     }, error=>{
         console.log ("Dashmanager error: ",error)
+        frappe.throw ("Dashmanager error: "+error)
     })
 
 }
@@ -78,11 +77,40 @@ function onLoadHandlerForDashDocForm(frm) {
 function renderFields(fields_components, frm) {
     return frappe.run_serially([
         ()=>{
-            // TODO:
-            console.log("Rendering for :", frm.doctype)
-            console.log("The components", fields_components)
+            // for each field render components
+            for (fieldno in fields_components.fields) {
+                //render all components for the field.
+                console.log("Rendering Field...")
+                renderField(frm.doctype,fields_components.fields[fieldno], fields_components.components[fields_components.fields[fieldno]], frm)
+            }
         }
     ]);
+}
+
+function renderField(doctype,field, components, frm) {
+    // not using components as of now... kept for future availability
+    return frappe.run_serially([
+        () => {
+            //call get_dashboard_components with doctype and field as argument.
+            return frappe.call({
+                method: "dashmanager.dashmanager.doctype.dashmanager.dashmanager.get_dashboard_components",
+                args: {
+                    doctype: doctype,
+                    field: field
+                }
+            })
+        }]).then(
+            (r) => {
+                if (r && r.message) {
+                    $(frm.fields_dict[field].wrapper).html(r.message);
+                    console.log("rendered")
+                }
+            }, (error) =>{
+                console.log("Error",error)
+                frappe.throw("Cannot render Dashmanager components:"+error)
+            }
+        );
+    
 }
 
 function getRegisteredFieldsAndComponentsForDashDocType(doctype){
@@ -108,70 +136,70 @@ function getRegisteredFieldsAndComponentsForDashDocType(doctype){
         })
 }
 
-if (route_type=="Form") {
-    if (route) {
-        console.log ("Fetching Data and components for: ", route)
-        frappe.call({
-            method: "dashmanager.dashmanager.doctype.dashmanager.dashmanager.get_dashboard_components",
-            callback: function(r) {
-                // code snippet
-                console.log (r.message)
-                if (r.message) {
-                    // var component_fields = r.message;
-                    // render_components (component_fields, route);
-                    var fieldHtml = r.message;
-                    render_test(fieldHtml, route)
-                }
-            }, args: {
-                doctype:route
-            }, error:function(error) {
-                console.log("Error:",error)
-            }
-        })
-        // call the API for fetching the components.
+// if (route_type=="Form") {
+//     if (route) {
+//         console.log ("Fetching Data and components for: ", route)
+//         frappe.call({
+//             method: "dashmanager.dashmanager.doctype.dashmanager.dashmanager.get_dashboard_components",
+//             callback: function(r) {
+//                 // code snippet
+//                 console.log (r.message)
+//                 if (r.message) {
+//                     // var component_fields = r.message;
+//                     // render_components (component_fields, route);
+//                     var fieldHtml = r.message;
+//                     render_test(fieldHtml, route)
+//                 }
+//             }, args: {
+//                 doctype:route
+//             }, error:function(error) {
+//                 console.log("Error:",error)
+//             }
+//         })
+//         // call the API for fetching the components.
 
-    }
-}
+//     }
+// }
 
 
-function render_test(html, doctype) {
-    // just want to see if the chart is getting rendered.
-    console.log("Render Test")
-    frappe.ui.form.on(doctype,{
-        onload:function(frm) {
-            console.log ("rendering the html")
-            $(frm.fields_dict["testfield"].wrapper).html(html);
-        }
-    })
-}
-// we will not do in this way, but need to put in more structured way.. 
-// this is just to get the feel of the flow
-function render_components(component_fields, doctype) {
-    // array of component fields
-    // one field can have multiple components.
+// function render_test(html, doctype) {
+//     // just want to see if the chart is getting rendered.
+//     console.log("Render Test")
+//     frappe.ui.form.on(doctype,{
+//         onload:function(frm) {
+//             console.log ("rendering the html")
+//             $(frm.fields_dict["testfield"].wrapper).html(html);
+//         }
+//     })
+// }
+// // we will not do in this way, but need to put in more structured way.. 
+// // this is just to get the feel of the flow
+// function render_components(component_fields, doctype) {
+//     // array of component fields
+//     // one field can have multiple components.
 
-    // loop each field.
+//     // loop each field.
 
-    frappe.ui.form.on(doctype, {
-        refresh: function (frm) {
-            console.log("Rendering Template....")
-            for (fieldno in component_fields) {
-                console.log("renderng field_", component_fields[fieldno]);
-                var field_name = component_fields[fieldno].ref_docfield.split("-")[1];
-                if (frm.fields_dict[field_name]) {
-                    // render all components
-                    for (component_no in component_fields[fieldno].components) {
-                        console.log ("Working on component:", component_no)
-                        console.log("Rendering Templates :", component_fields[fieldno].components[component_no].template)
-                        $(frm.fields_dict[field_name].wrapper)
-                            .html(frappe.render_template(component_fields[fieldno].components[component_no].template, {
-                                component: component_fields[fieldno].components[component_no],
-                                componentdatajson : JSON.stringify(component_fields[fieldno].components[component_no].data)
-                            }))
+//     frappe.ui.form.on(doctype, {
+//         refresh: function (frm) {
+//             console.log("Rendering Template....")
+//             for (fieldno in component_fields) {
+//                 console.log("renderng field_", component_fields[fieldno]);
+//                 var field_name = component_fields[fieldno].ref_docfield.split("-")[1];
+//                 if (frm.fields_dict[field_name]) {
+//                     // render all components
+//                     for (component_no in component_fields[fieldno].components) {
+//                         console.log ("Working on component:", component_no)
+//                         console.log("Rendering Templates :", component_fields[fieldno].components[component_no].template)
+//                         $(frm.fields_dict[field_name].wrapper)
+//                             .html(frappe.render_template(component_fields[fieldno].components[component_no].template, {
+//                                 component: component_fields[fieldno].components[component_no],
+//                                 componentdatajson : JSON.stringify(component_fields[fieldno].components[component_no].data)
+//                             }))
 
-                    }
-                }
-            }
-        }
-    })
-}
+//                     }
+//                 }
+//             }
+//         }
+//     })
+// }
