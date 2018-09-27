@@ -17,7 +17,8 @@ class Dashmanager(Document):
 	def validate_duplicates(self):
 		existing_docs = frappe.get_all("Dashmanager", filters={"ref_doctype":self.ref_doctype, "ref_docfield":self.ref_docfield})
 		if len (existing_docs) > 0:
-			frappe.throw("Cannot have Two Dashmanagers for same DocType and Custom Field")
+			if existing_docs[0].name != self.name: 
+				frappe.throw("Cannot have two Dashmanagers for same DocType and Custom Field")
 
 	def sql_builder(self):
 		pass
