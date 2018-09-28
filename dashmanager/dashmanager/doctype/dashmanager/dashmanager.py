@@ -67,6 +67,7 @@ class Dashmanager(Document):
 		components = []
 		index = 0
 		rendered_htmls = []
+		boostrap_setting_dict = get_boostrap_settings()
 		
 		for component in self.components:
 			component_obj = {
@@ -80,7 +81,8 @@ class Dashmanager(Document):
 			rendered_htmls.append(
 				frappe.render_template("dashmanager/templates/barcharttemplate.html", {
 				"component":component_obj ,
-				"componentdatajson" : json.dumps(component_obj["data"])
+				"componentdatajson" : json.dumps(component_obj["data"]),
+				"col_class":boostrap_setting_dict[component.component_size]
 				})
 			)
 			
@@ -220,6 +222,33 @@ def get_fields_component_list(doctype):
 		fields_component_list[field] =  filtered_components
 	
 	return fields_list, fields_component_list
+
+@frappe.whitelist()
+def get_dashmanager_components_settings():
+	boostrap_setting_dict = get_boostrap_settings()
+	icon_settings_dict = get_icon_settings()
+
+	response = {
+		"boostrap_settings" : boostrap_setting_dict,
+		"icon_settings":icon_settings_dict
+	}
+
+	return json.dumps(response)
+
+def get_boostrap_settings():
+	boostrap_setting_dict = {}
+	boostrap_settings = frappe.get_all("Dashmanager Component Setting", filters={"setting_type":"Bootstrap Class"}, fields=["setting_key", "setting_value"])
+	for bsetting in boostrap_settings:
+		boostrap_setting_dict[bsetting.setting_key] = bsetting.setting_value
+	return boostrap_setting_dict
+
+def get_icon_settings():
+	icon_settings_dict = {}
+	icon_settings = frappe.get_all("Dashmanager Component Setting", filters={"setting_type":"Icon"}, fields=["setting_key", "setting_value"])
+	for isetting in icon_settings:
+		icon_settings_dict[isetting.setting_key] = isetting.setting_value
+	return icon_settings_dict
+
 
 script = """\", {
 	refresh: frm => {

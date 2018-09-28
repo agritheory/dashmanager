@@ -2,6 +2,7 @@
 	"js/erpnext.min.js": [
         "public/js/dashboardtemplate.html", 
         "public/js/templates/barcharttemplate.html", 
-        "public/js/templates/tabletemplate.html"
+        "public/js/templates/tabletemplate.html",
+        "public/js/templates/previewtemplate.html"
     ]
 }

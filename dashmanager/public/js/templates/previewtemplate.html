@@ -1,0 +1,5 @@
+<div class="row" id="{{previewdivid}}">
+    {% for component in components %}    
+        <div id="{{component.idx}}" class= "{{component.col_class}} text-center grid-heading-row" style="cursor: move;cursor: -webkit-grabbing;border:1px solid; padding:2px; height:200px;"><div style="position:absolute; top:50%;left:50%; transform:translateY(-50%) translateX(-50%);"><i class="{{component.icon}}"  style="font-size:50px"></i><div>{{component.component_title}}({{component.component_type}})</div></div></div>
+    {% endfor %}
+</div>
