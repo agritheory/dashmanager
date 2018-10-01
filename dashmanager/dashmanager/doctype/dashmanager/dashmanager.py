@@ -7,6 +7,8 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils.jinja import validate_template  # probably don't need this method, but likely other jinja utilities
 import json
+from  DashComponentsWrappers import * 
+
 
 class Dashmanager(Document):
 	# validation methods
@@ -76,10 +78,10 @@ class Dashmanager(Document):
 				"data": self.getDataForComponent(component.component_type, component, self.ref_doctype, self.ref_docfield),
 				"domid":self.ref_docfield+"_"+str(index)
 			} ## some fields may not be required. Will remove in future
-
 			
+			template_to_render = self.getTemplateForComponent(component.component_type, component, self.ref_doctype, self.ref_docfield)
 			rendered_htmls.append(
-				frappe.render_template("dashmanager/templates/barcharttemplate.html", {
+				frappe.render_template(template_to_render, {
 				"component":component_obj ,
 				"componentdatajson" : json.dumps(component_obj["data"]),
 				"col_class":boostrap_setting_dict[component.component_size]
@@ -113,30 +115,47 @@ class Dashmanager(Document):
 	
 	def getChartData(self, component, ref_doctype, ref_docfield):
 		## here the data will come from SQL and not statically
-		return {
-			"data": {
-				"labels": ["12am-3am", "3am-6am", "6am-9am", "9am-12pm","12pm-3pm", "3pm-6pm", "6pm-9pm", "9pm-12am"],
-				"datasets": [
-					{
-						"name": "Some Data", "chartType": 'bar',
-						"values": [25, 40, 30, 35, 8, 52, 17, -4]
-					},
-					{
-						"name": "Another Set", "chartType": 'bar',
-						"values": [25, 50, -10, 15, 18, 32, 27, 14]
-					},
-					{
-						"name": "Yet Another", "chartType": 'line',
-						"values": [15, 20, -3, -15, 58, 12, -17, 37]
-					}],
-				"yMarkers": [{ "label": "Marker", "value": 70,"options": { "labelPos": 'left' }}],
-				"yRegions": [{ "label": "Region", "start": -10, "end": 50,"options": { "labelPos": 'right' }}]
-			},
-			"title": "My Awesome Chart",
+
+
+		settings = {
+			"title": component.component_title,
 			"type": 'axis-mixed', ##// or 'bar', 'line', 'pie', 'percentage'
 			"height": 300,
-			"colors": ['purple', '#ffa3ef', 'light-blue'],
+			"colors": ['purple', '#ffa3ef', 'light-blue']
 		}
+		
+		chartModel = ChartModel(settings)
+		chartModel.setLabels(ChartLabel(["12am-3am", "3am-6am", "6am-9am", "9am-12pm","12pm-3pm", "3pm-6pm", "6pm-9pm", "9pm-12am"]))
+		chartModel.addDataSets(ChartDataSet("Some Data 1", [25, 40, 30, 35, 8, 52, 17, -4],"bar"))
+		chartModel.addDataSets(ChartDataSet("Some Data 1", [25, 50, -10, 15, 18, 32, 27, 14],"bar"))
+		chartModel.addDataSets(ChartDataSet("Some Data 1", [15, 20, -3, -15, 58, 12, -17, 37],"bar"))
+
+		return chartModel.generateChartModelObject()
+		
+		# return {
+		# 	"data": {
+		# 		"labels": ["12am-3am", "3am-6am", "6am-9am", "9am-12pm","12pm-3pm", "3pm-6pm", "6pm-9pm", "9pm-12am"],
+		# 		"datasets": [
+		# 			{
+		# 				"name": "Some Data", "chartType": 'bar',
+		# 				"values": [25, 40, 30, 35, 8, 52, 17, -4]
+		# 			},
+		# 			{
+		# 				"name": "Another Set", "chartType": 'bar',
+		# 				"values": [25, 50, -10, 15, 18, 32, 27, 14]
+		# 			},
+		# 			{
+		# 				"name": "Yet Another", "chartType": 'line',
+		# 				"values": [15, 20, -3, -15, 58, 12, -17, 37]
+		# 			}],
+		# 		"yMarkers": [{ "label": "Marker", "value": 70,"options": { "labelPos": 'left' }}],
+		# 		"yRegions": [{ "label": "Region", "start": -10, "end": 50,"options": { "labelPos": 'right' }}]
+		# 	},
+		# 	"title": component.component_title,
+		# 	"type": 'axis-mixed', ##// or 'bar', 'line', 'pie', 'percentage'
+		# 	"height": 300,
+		# 	"colors": ['purple', '#ffa3ef', 'light-blue'],
+		# }
 		
 
 	
@@ -145,8 +164,46 @@ class Dashmanager(Document):
 	def getTableData(self, component, ref_doctype, ref_docfield):
 		## here the data will come from SQL and not statically
 		return {
-			"columns": ['Name', 'Position', 'Salary'],
-			"data": [['Faris', 'Software Developer', '$1200'],['Manas', 'Software Engineer', '$1400']]
+			"columns": json.dumps([{
+				"name":"Name",
+				"field":"name",
+				"id":"name"
+			},{
+				"name":"Age",
+				"field":"age",
+				"id":"age"
+			},{
+				"name":"Number",
+				"field":"number",
+				"id":"number"
+			},{
+				"name":"Description",
+				"field":"description",
+				"id":"description",
+				"width":300
+			}
+			]),
+			"data": json.dumps([{
+				"name":"John",
+				"age":12,
+				"number":999923993993,
+				"description":"This is a dummy text.This is a dummy text."
+			},{
+				"name":"Doe",
+				"age":14,
+				"number":999923993993,
+				"description":"This is a dummy text.This is a dummy text."
+			},{
+				"name":"Doe",
+				"age":14,
+				"number":999923993993,
+				"description":"This is a dummy text.This is a dummy text."
+			},{
+				"name":"Doe",
+				"age":14,
+				"number":999923993993,
+				"description":"This is a dummy text.This is a dummy text."
+			}])
 		}
 
 

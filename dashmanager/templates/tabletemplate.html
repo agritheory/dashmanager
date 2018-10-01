@@ -1,0 +1,22 @@
+<div class="{{col_class}}">
+<div>{{component.title}}</div>
+<div id="{{component.domid}}"  style="min-height:300px"></div>
+</div>
+<script type="text/javascript">
+    console.log("Testing Table");
+    // new DataTable("#testgrid", {
+    //     columns: ['First Name', 'Last Name', 'Position'],
+    //     data: [
+    //         ['Don', 'Joe', 'Designer'],
+    //         ['Mary', 'Jane', 'Software Developer']
+    //     ]
+    // });
+
+    var data = {{component.data.data}}
+    var columns = {{component.data.columns}}
+    new Slick.Grid("#{{component.domid}}", data, columns , {
+        enableCellNavigation: true,
+        enableColumnReorder: false
+    })
+    console.log("Done");
+</script>
