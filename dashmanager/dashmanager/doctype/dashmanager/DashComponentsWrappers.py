@@ -63,3 +63,59 @@ class ChartLabel:
         if not isinstance(self.labels, list):
             raise Exception("Chart Labels are not List of Strings")
         return self.labels
+
+class Table:
+    def __init__ (self, cols, rows):
+        if not isinstance(cols, list):
+            raise Exception("Cols can be list only.")
+        if not isinstance(rows, list):
+            raise Exception("Rows can be list of list only.")
+        
+        ## other validations if required.... 
+
+        self.cols = cols
+        self.rows = rows
+        self.settings = {
+            "rowno":True
+        }
+
+    def setSettings(self, settingsDict):
+        for setting in settingsDict:
+            self.settings[setting] = settingsDict[setting]
+    
+    def generateTableModelObject(self):
+        return {
+            "columns": self.cols,
+            "rows": self.rows,
+            "settings": self.settings
+        }
+
+class List:
+    def __init__ (self, listitems):
+        self.listitems = []
+        self.settings={
+			"type":"ordered",
+			"bullets":True,
+			"hasvalues":True
+		}
+
+        if listitems and isinstance(listitems, list):
+            for item in listitems:
+                self.listitems.append(item.__dict__)
+             
+    
+    def setSettings(self, settingsDict):
+        for setting in settingsDict:
+            self.settings[setting] = settingsDict[setting]
+    
+    def generateListModelObject(self):
+        print ("Items:", self.listitems)
+        return {
+            "listitems": self.listitems,
+            "settings":self.settings
+        }
+
+class ListItem:
+    def __init__ (self, item, value):
+        self.item = item
+        self.value = value

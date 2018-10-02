@@ -1,0 +1,9 @@
+<div id="{{component.domid}}" class="{{col_class}} border" style="padding-top:10px;height: 200px;overflow-y: scroll;outline:4px">
+    <div><b>{{component.title}}</b></div>
+    {{component.data.items}}
+    <{{ 'ol' if component.data.settings.type=='ordered' else 'ul' }} style="width:100%;margin-top:10px;{%if not component.data.settings.bullets %}list-style-type:none; {%endif%}">
+        {% for item in component.data.listitems %}
+        <li><span>{{item.item}}<span>{%if component.data.settings.hasvalues%}<span style="float:right">{{item.value}}</span>{% endif %}</li>
+        {% endfor %}
+    </{{ 'ol' if component.data.settings.type=='ordered' else 'ul' }}>
+</div>

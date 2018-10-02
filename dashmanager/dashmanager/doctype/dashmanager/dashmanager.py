@@ -78,7 +78,7 @@ class Dashmanager(Document):
 				"data": self.getDataForComponent(component.component_type, component, self.ref_doctype, self.ref_docfield),
 				"domid":self.ref_docfield+"_"+str(index)
 			} ## some fields may not be required. Will remove in future
-			
+			print("Data", component_obj["data"])
 			template_to_render = self.getTemplateForComponent(component.component_type, component, self.ref_doctype, self.ref_docfield)
 			rendered_htmls.append(
 				frappe.render_template(template_to_render, {
@@ -100,10 +100,15 @@ class Dashmanager(Document):
 		return "".join(rendered_htmls)#components
 	
 	def getTemplateForComponent(self, type, component, ref_doctype, ref_docfield):
+		## TODO: to put a dict mapping instead of the lousy if...
 		if type=="Chart":
 			return "dashmanager/templates/barcharttemplate.html"
 		if type=="Table":
-			return "dashmanager/templates/tabletemplate.html"
+			return "dashmanager/templates/simpletabletemplate.html"
+		if type=="List":
+			return "dashmanager/templates/listtemplate.html"
+		if type=="Value":
+			return "dashmanager/templates/valuestemplate.html"
 
 	def getDataForComponent(self, type,component, ref_doctype, ref_docfield):
 		### todo: rendering of data based on type of component.
@@ -112,6 +117,12 @@ class Dashmanager(Document):
 		
 		if type=="Table":
 			return self.getTableData(component, ref_doctype, ref_docfield)
+		
+		if type=="List":
+			return self.getListData(component, ref_doctype, ref_docfield)
+		
+		if type=="Value":
+			return self.getValuesData(component, ref_doctype, ref_docfield)
 	
 	def getChartData(self, component, ref_doctype, ref_docfield):
 		## here the data will come from SQL and not statically
@@ -163,47 +174,87 @@ class Dashmanager(Document):
 	
 	def getTableData(self, component, ref_doctype, ref_docfield):
 		## here the data will come from SQL and not statically
+
+		table = Table(["One", "Two", "Three"], [
+				["Data 1","Data 2","Data 3"],
+				["Data 12","Data 2","Data 3"]
+			])
+
+		return table.generateTableModelObject()
+		
+		# {
+		# 	"columns": ["One", "Two", "Three"],
+		# 	"rows" : [
+		# 		["Data 1","Data 2","Data 3"],
+		# 		["Data 1","Data 2","Data 3"]
+		# 	],"settings":{
+		# 		"rowno":True
+		# 	}
+		# }
+		# return {
+		# 	"columns": json.dumps([{
+		# 		"name":"Name",
+		# 		"field":"name",
+		# 		"id":"name"
+		# 	},{
+		# 		"name":"Age",
+		# 		"field":"age",
+		# 		"id":"age"
+		# 	},{
+		# 		"name":"Number",
+		# 		"field":"number",
+		# 		"id":"number"
+		# 	},{
+		# 		"name":"Description",
+		# 		"field":"description",
+		# 		"id":"description",
+		# 		"width":300
+		# 	}
+		# 	]),
+		# 	"data": json.dumps([{
+		# 		"name":"John",
+		# 		"age":12,
+		# 		"number":999923993993,
+		# 		"description":"This is a dummy text.This is a dummy text."
+		# 	},{
+		# 		"name":"Doe",
+		# 		"age":14,
+		# 		"number":999923993993,
+		# 		"description":"This is a dummy text.This is a dummy text."
+		# 	},{
+		# 		"name":"Doe",
+		# 		"age":14,
+		# 		"number":999923993993,
+		# 		"description":"This is a dummy text.This is a dummy text."
+		# 	},{
+		# 		"name":"Doe",
+		# 		"age":14,
+		# 		"number":999923993993,
+		# 		"description":"This is a dummy text.This is a dummy text."
+		# 	}])
+		# }
+	
+	def getListData(self, component, ref_doctype, ref_docfield):
+		settings = {
+			"type":"ordered",
+			"bullets":True,
+			"hasvalues":True
+		}
+
+		list = List([ListItem("One","Value 1"),ListItem("Two","Value 2"),ListItem("Three","Value 3")])
+		list.setSettings(settings)
+		# list.
+		
+		
+		return list.generateListModelObject()
+	
+	def getStatusData(self, component, ref_doctype, ref_docfield):
+		pass
+
+	def getValuesData(self, component, ref_doctype, ref_docfield):
 		return {
-			"columns": json.dumps([{
-				"name":"Name",
-				"field":"name",
-				"id":"name"
-			},{
-				"name":"Age",
-				"field":"age",
-				"id":"age"
-			},{
-				"name":"Number",
-				"field":"number",
-				"id":"number"
-			},{
-				"name":"Description",
-				"field":"description",
-				"id":"description",
-				"width":300
-			}
-			]),
-			"data": json.dumps([{
-				"name":"John",
-				"age":12,
-				"number":999923993993,
-				"description":"This is a dummy text.This is a dummy text."
-			},{
-				"name":"Doe",
-				"age":14,
-				"number":999923993993,
-				"description":"This is a dummy text.This is a dummy text."
-			},{
-				"name":"Doe",
-				"age":14,
-				"number":999923993993,
-				"description":"This is a dummy text.This is a dummy text."
-			},{
-				"name":"Doe",
-				"age":14,
-				"number":999923993993,
-				"description":"This is a dummy text.This is a dummy text."
-			}])
+			"caption": "Total Sales",
+			"value":"$100000"
 		}
 
 

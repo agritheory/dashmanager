@@ -1,0 +1,24 @@
+<div class="{{col_class}} border" style="padding-top:10px; height: 200px; overflow-y: scroll; outline:4px">
+    <div><b>{{component.title}}</b></div>
+    <table class="table">
+        <thead>
+            <tr>
+                {% if component.data.settings.rowno%}<th scope="col">#</th> {%endif%}
+                {% for col in component.data.columns%}
+                <th scope="col">{{col}}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in component.data.rows %}
+            <tr>
+                {% if component.data.settings.rowno%}<th scope="row">{{loop.index}}</th> {% endif %}
+                {% for cell in row%}
+                <td>{{cell}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
