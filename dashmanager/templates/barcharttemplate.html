@@ -1,6 +1,8 @@
-<div id="{{component.domid}}" class="{{col_class}} border" style="outline:4px"></div>
+<div class="{{col_class}}" style="padding:3px;">
+    <div id="{{component.domid}}" class="border" style="padding:4px"></div>
+</div>
 <script type="text/javascript">
-    console.log ("Testing");
-    new frappeChart.Chart("#{{component.domid}}",{{componentdatajson}});
-    console.log ("Done");
+    console.log("Testing");
+    new frappeChart.Chart("#{{component.domid}}", {{ componentdatajson }});
+    console.log("Done");
 </script>

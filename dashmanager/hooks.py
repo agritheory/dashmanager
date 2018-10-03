@@ -123,4 +123,6 @@ app_include_js = "/assets/dashmanager/js/dashmanager.js"
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "dashmanager.event.get_events"
 # }
-
+dashmanager_renders={
+    "hook1":"dashmanager.dashmanager.test_hook_file.test_hook"
+}

@@ -75,8 +75,8 @@ function mapDataGridWithPreview(frm) {
 		type = components[cno].component_type
 		size = components[cno].component_size
 		idx = "cidx"+components[cno].idx
-		components[cno].col_class = percentage_to_col_mapping[size]
-		components[cno].icon = component_type_icon_map[type]
+		components[cno].col_class = settings.boostrap_settings[size]
+		components[cno].icon = settings.icon_settings[type]
 
 		preview_html += "<div id='"+idx+"' class='"+percentage_to_col_mapping[size]+" text-center grid-heading-row ' style='cursor: move;cursor: -webkit-grabbing;border:1px solid; padding:2px; height:200px;'><div style='position:absolute; top:50%;left:50%; transform:translateY(-50%) translateX(-50%);'><i class='"+component_type_icon_map[type]+"'  style='font-size:50px'></i><div>"+title+"("+type+")</div></div></div>"
 	}

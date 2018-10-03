@@ -175,11 +175,12 @@ class Dashmanager(Document):
 	def getTableData(self, component, ref_doctype, ref_docfield):
 		## here the data will come from SQL and not statically
 
-		table = Table(["One", "Two", "Three"], [
-				["Data 1","Data 2","Data 3"],
-				["Data 12","Data 2","Data 3"]
-			])
+		# table = Table(["One", "Two", "Three"], [
+		# 		["Data 1","Data 2","Data 3"],
+		# 		["Data 12","Data 2","Data 3"]
+		# 	])
 
+		table = Table(str(component.table_columns).splitlines(False), self.getQueryResult(component.component_contents))
 		return table.generateTableModelObject()
 		
 		# {
@@ -235,16 +236,17 @@ class Dashmanager(Document):
 		# }
 	
 	def getListData(self, component, ref_doctype, ref_docfield):
-		settings = {
-			"type":"ordered",
-			"bullets":True,
-			"hasvalues":True
-		}
+		# settings = {
+		# 	"type":"ordered",
+		# 	"bullets":True,
+		# 	"hasvalues":True
+		# }
 
-		list = List([ListItem("One","Value 1"),ListItem("Two","Value 2"),ListItem("Three","Value 3")])
-		list.setSettings(settings)
+		# list = List([ListItem("One","Value 1"),ListItem("Two","Value 2"),ListItem("Three","Value 3")])
+		# list.setSettings(settings)
 		# list.
 		
+		list = self.getTheHook()
 		
 		return list.generateListModelObject()
 	
@@ -252,10 +254,30 @@ class Dashmanager(Document):
 		pass
 
 	def getValuesData(self, component, ref_doctype, ref_docfield):
+		# print("code:",component.component_contents)
+		code = str(component.component_contents)
+		function_name = str(ref_docfield).replace("-","")+str(component.component_title)
+		print ("name options:", ref_docfield, component.component_title)
+		code = "def "+function_name+"():\n\t"+("\t".join(code.splitlines(True)))
+		code_obj = compile(str(code), "component.component_contents", 'exec')
+		print ("code_obj", code)
+		exec(code_obj, globals(), globals())
+		value = eval(function_name+"()")
 		return {
-			"caption": "Total Sales",
-			"value":"$100000"
+			"caption": component.component_title,
+			"value":value
 		}
+	
+	def getTheHook(self):
+		hook_name = frappe.get_hooks(app_name="dashmanager").get("dashmanager_renders")["hook1"]
+		h = frappe.get_attr(hook_name[0])
+		a = h()
+		return a
+		# print ("a: "+str(a.generateListModelObject()))
+	
+	def getQueryResult(self, query):
+		query = frappe.db.sql(query, {}, as_list=True)
+		return query
 
 
 
