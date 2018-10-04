@@ -1,10 +1,14 @@
 
 
 class ChartModel:
-    def __init__(self, settings):
+    def __init__(self):
         # self.datasets = dataset
         # self.labelsets = labelsets
-        self.settings = settings
+        self.settings = {
+			"type": 'axis-mixed', ##// or 'bar', 'line', 'pie', 'percentage'
+			"height": 300,
+			"colors": ['purple', '#ffa3ef', 'light-blue']
+		}
         self.datasets = []
     
     def setLabels(self, labels): 
@@ -34,6 +38,10 @@ class ChartModel:
 			"height": self.settings["height"],
 			"colors": self.settings["colors"]
         }
+    
+    def setSettings(self, settingsDict):
+        for setting in settingsDict:
+            self.settings[setting] = settingsDict[setting]
 
     
     
@@ -119,3 +127,15 @@ class ListItem:
     def __init__ (self, item, value):
         self.item = item
         self.value = value
+
+class SummaryValue:
+    def __init__ (self, value, caption):
+        self.value = value
+        self.caption = caption
+    
+    def generateSummaryValueObject(self):
+        return {
+			"caption": self.caption,
+			"value":self.value
+		}
+        

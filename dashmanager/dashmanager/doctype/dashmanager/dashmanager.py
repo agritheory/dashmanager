@@ -124,159 +124,77 @@ class Dashmanager(Document):
 		if type=="Value":
 			return self.getValuesData(component, ref_doctype, ref_docfield)
 	
+	def getDataFromDataSource(self, component, ref_doctype, ref_docfield, datasource, hook):
+		if datasource == "Python Script":
+			return self.getPythonScriptResult( component, ref_doctype, ref_docfield)
+		elif datasource == "Hook":
+			return self.getTheHook(hook)
+		elif datasource == "SQL":
+			return self.getQueryResult(component)
+		else: 
+			## temperory fail safe
+			return self.getDataForComponent(type, component, ref_doctype, ref_docfield)
+		pass
+	
+	def convertSqlToWrapperObjects(self, component, ref_doctype, ref_docfield, type):
+		pass
+	
 	def getChartData(self, component, ref_doctype, ref_docfield):
 		## here the data will come from SQL and not statically
-
-
+		chartModel = self.getDataFromDataSource(component, ref_doctype, ref_docfield, component.data_source,component.hook_name)
 		settings = {
 			"title": component.component_title,
 			"type": 'axis-mixed', ##// or 'bar', 'line', 'pie', 'percentage'
 			"height": 300,
 			"colors": ['purple', '#ffa3ef', 'light-blue']
 		}
-		
-		chartModel = ChartModel(settings)
-		chartModel.setLabels(ChartLabel(["12am-3am", "3am-6am", "6am-9am", "9am-12pm","12pm-3pm", "3pm-6pm", "6pm-9pm", "9pm-12am"]))
-		chartModel.addDataSets(ChartDataSet("Some Data 1", [25, 40, 30, 35, 8, 52, 17, -4],"bar"))
-		chartModel.addDataSets(ChartDataSet("Some Data 1", [25, 50, -10, 15, 18, 32, 27, 14],"bar"))
-		chartModel.addDataSets(ChartDataSet("Some Data 1", [15, 20, -3, -15, 58, 12, -17, 37],"bar"))
-
+		chartModel.setSettings(settings)
 		return chartModel.generateChartModelObject()
-		
-		# return {
-		# 	"data": {
-		# 		"labels": ["12am-3am", "3am-6am", "6am-9am", "9am-12pm","12pm-3pm", "3pm-6pm", "6pm-9pm", "9pm-12am"],
-		# 		"datasets": [
-		# 			{
-		# 				"name": "Some Data", "chartType": 'bar',
-		# 				"values": [25, 40, 30, 35, 8, 52, 17, -4]
-		# 			},
-		# 			{
-		# 				"name": "Another Set", "chartType": 'bar',
-		# 				"values": [25, 50, -10, 15, 18, 32, 27, 14]
-		# 			},
-		# 			{
-		# 				"name": "Yet Another", "chartType": 'line',
-		# 				"values": [15, 20, -3, -15, 58, 12, -17, 37]
-		# 			}],
-		# 		"yMarkers": [{ "label": "Marker", "value": 70,"options": { "labelPos": 'left' }}],
-		# 		"yRegions": [{ "label": "Region", "start": -10, "end": 50,"options": { "labelPos": 'right' }}]
-		# 	},
-		# 	"title": component.component_title,
-		# 	"type": 'axis-mixed', ##// or 'bar', 'line', 'pie', 'percentage'
-		# 	"height": 300,
-		# 	"colors": ['purple', '#ffa3ef', 'light-blue'],
-		# }
-		
 
-	
-	
-	
+
+		# chartModel = ChartModel(settings)
+		# chartModel.setLabels(ChartLabel(["12am-3am", "3am-6am", "6am-9am", "9am-12pm","12pm-3pm", "3pm-6pm", "6pm-9pm", "9pm-12am"]))
+		# chartModel.addDataSets(ChartDataSet("Some Data 1", [25, 40, 30, 35, 8, 52, 17, -4],"bar"))
+		# chartModel.addDataSets(ChartDataSet("Some Data 1", [25, 50, -10, 15, 18, 32, 27, 14],"bar"))
+		# chartModel.addDataSets(ChartDataSet("Some Data 1", [15, 20, -3, -15, 58, 12, -17, 37],"bar"))
+
 	def getTableData(self, component, ref_doctype, ref_docfield):
 		## here the data will come from SQL and not statically
-
-		# table = Table(["One", "Two", "Three"], [
-		# 		["Data 1","Data 2","Data 3"],
-		# 		["Data 12","Data 2","Data 3"]
-		# 	])
-
-		table = Table(str(component.table_columns).splitlines(False), self.getQueryResult(component.component_contents))
-		return table.generateTableModelObject()
-		
-		# {
-		# 	"columns": ["One", "Two", "Three"],
-		# 	"rows" : [
-		# 		["Data 1","Data 2","Data 3"],
-		# 		["Data 1","Data 2","Data 3"]
-		# 	],"settings":{
-		# 		"rowno":True
-		# 	}
-		# }
-		# return {
-		# 	"columns": json.dumps([{
-		# 		"name":"Name",
-		# 		"field":"name",
-		# 		"id":"name"
-		# 	},{
-		# 		"name":"Age",
-		# 		"field":"age",
-		# 		"id":"age"
-		# 	},{
-		# 		"name":"Number",
-		# 		"field":"number",
-		# 		"id":"number"
-		# 	},{
-		# 		"name":"Description",
-		# 		"field":"description",
-		# 		"id":"description",
-		# 		"width":300
-		# 	}
-		# 	]),
-		# 	"data": json.dumps([{
-		# 		"name":"John",
-		# 		"age":12,
-		# 		"number":999923993993,
-		# 		"description":"This is a dummy text.This is a dummy text."
-		# 	},{
-		# 		"name":"Doe",
-		# 		"age":14,
-		# 		"number":999923993993,
-		# 		"description":"This is a dummy text.This is a dummy text."
-		# 	},{
-		# 		"name":"Doe",
-		# 		"age":14,
-		# 		"number":999923993993,
-		# 		"description":"This is a dummy text.This is a dummy text."
-		# 	},{
-		# 		"name":"Doe",
-		# 		"age":14,
-		# 		"number":999923993993,
-		# 		"description":"This is a dummy text.This is a dummy text."
-		# 	}])
-		# }
+		table = self.getDataFromDataSource(component,ref_doctype, ref_docfield, component.data_source, component.hook_name)
+		return Table(str(component.table_columns).splitlines(False), table).generateTableModelObject()
 	
 	def getListData(self, component, ref_doctype, ref_docfield):
-		# settings = {
-		# 	"type":"ordered",
-		# 	"bullets":True,
-		# 	"hasvalues":True
-		# }
-
-		# list = List([ListItem("One","Value 1"),ListItem("Two","Value 2"),ListItem("Three","Value 3")])
-		# list.setSettings(settings)
-		# list.
-		
-		list = self.getTheHook()
-		
+		list = self.getDataFromDataSource(component, ref_doctype, ref_docfield, component.data_source, component.hook_name)		
+		print("List", list)
 		return list.generateListModelObject()
 	
 	def getStatusData(self, component, ref_doctype, ref_docfield):
 		pass
 
 	def getValuesData(self, component, ref_doctype, ref_docfield):
-		# print("code:",component.component_contents)
+		value = self.getDataFromDataSource(component, ref_doctype, ref_docfield, component.data_source, component.hook_name)
+		return SummaryValue(value, component.component_title).generateSummaryValueObject()
+	
+	def getPythonScriptResult(self, component, ref_doctype, ref_docfield):
 		code = str(component.component_contents)
-		function_name = str(ref_docfield).replace("-","")+str(component.component_title)
+		function_name = str(ref_docfield).replace("-","")+str(component.component_title).replace(" ","").replace("-","")
 		print ("name options:", ref_docfield, component.component_title)
 		code = "def "+function_name+"():\n\t"+("\t".join(code.splitlines(True)))
 		code_obj = compile(str(code), "component.component_contents", 'exec')
 		print ("code_obj", code)
 		exec(code_obj, globals(), globals())
 		value = eval(function_name+"()")
-		return {
-			"caption": component.component_title,
-			"value":value
-		}
+		return value
 	
-	def getTheHook(self):
-		hook_name = frappe.get_hooks(app_name="dashmanager").get("dashmanager_renders")["hook1"]
+	def getTheHook(self, hook):
+		print("Hook:", hook)
+		hook_name = frappe.get_hooks(app_name="dashmanager").get("dashmanager_renders")[hook]
 		h = frappe.get_attr(hook_name[0])
 		a = h()
 		return a
-		# print ("a: "+str(a.generateListModelObject()))
 	
-	def getQueryResult(self, query):
-		query = frappe.db.sql(query, {}, as_list=True)
+	def getQueryResult(self, component):
+		query = frappe.db.sql(component.component_contents, {}, as_list=True)
 		return query
 
 
@@ -295,23 +213,12 @@ def get_dashboard_components(doctype, field):
 	print("Dashs:",dashs)
 	dash = frappe.get_doc("Dashmanager", dashs[0])
 	return dash.build_dashboard_components()
-	## changing this to return the rendered template instead of just json data.
-	## return fields
-
-	## a test... response will go field wise.. 
-	##return ""
-	# # frappe.render_template("dashmanager/templates/barcharttemplate.html", {
-	# 	"component":fields[0]["components"][0] ,
-	# 	"componentdatajson" : json.dumps(fields[0]["components"][0]["data"])
-	# })
 
 @frappe.whitelist()
 def get_dashmanager_docs():
-	#### this should return all the documents for which the dashmanager has a registered component.
-	
+	#### this should return all the documents for which the dashmanager has a registered component.	
 	## getting all doctypes from all dashmanagers
 	ref_docs = get_registered_docs_for_dashmanager()
-	
 	return {
 		"ref_docs" : json.dumps(ref_docs)
 	}
