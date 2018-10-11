@@ -1,12 +1,14 @@
-<div id="{{component.domid}}" class="{{col_class}}" style="padding:3px;height: 200px;overflow-y: scroll;background-color: #fafbfc">
-    <div style="height: 100%;width: 100%; padding:4px" class="border rounded">
+<div id="{{component.domid}}" class="{{col_class}}" style="padding:3px;height: {{component.data.settings.height}}px;">
+    <div style="height: 100%;width: 100%; padding:4px ;background-color: #fafbfc; overflow-y: auto;-webkit-overflow-scrolling: scroll" class="border rounded">
         <div><b>{{component.title}}</b></div>
-        {{component.data.items}}
         <{{ 'ol' if component.data.settings.type=='ordered' else 'ul' }} style="width:100%;margin-top:10px;{%if not component.data.settings.bullets %}list-style-type:none; {%endif%}">
             {% for item in component.data.listitems %}
             <li><span>{{item.item}}</span>{%if component.data.settings.hasvalues%}<span style="float:right">{{item.value}}</span>{%
                         endif %}</li>
             {% endfor %}
         </{{ 'ol' if component.data.settings.type=='ordered' else 'ul' }}>
+        {%if component.data.settings.overflow %}
+            <div>{{component.data.settings.knowmoretext}}</div>
+        {%endif%}
     </div>
 </div>

@@ -20,12 +20,13 @@ class ChartModel:
         
         self.labels = labels
 
-    def addDataSets(self, dataset ):
+    def addDataSets(self, dataset):
         if not isinstance(dataset, ChartDataSet):
             raise Exception("Dataset should be of type ChartDataSet")
         self.datasets.append(dataset.getDataSets())
     
     def generateChartModelObject (self):
+        #print ("Chart Type", self.settings["type"])
         return {
             "data": {
                 "labels":self.labels.getLabels(),
@@ -35,8 +36,8 @@ class ChartModel:
             },
             "title": self.settings["title"],
 			"type": self.settings["type"], ##// or 'bar', 'line', 'pie', 'percentage'
-			"height": self.settings["height"],
-			"colors": self.settings["colors"]
+			"height": self.settings["height"]#,
+			# "colors": self.settings["colors"]
         }
     
     def setSettings(self, settingsDict):
@@ -47,20 +48,24 @@ class ChartModel:
     
     
 class ChartDataSet:
-    def __init__(self, name, values, chartType):
+    def __init__(self, values, name=None,  chartType=None):
         self.name = name
         self.values = values
-        self.chartType = chartType
+        self.chartType = chartType 
     
     def getDataSets(self):
         if not isinstance(self.values, list):
             raise Exception("Values should be array of numbers")
         
-        return {
+        datasets  = {
             "name": self.name,
-            "values":self.values,
-            "chartType":self.chartType
+            "values":self.values
         }
+        
+        if self.chartType:
+            datasets["chartType"] = self.chartType
+        
+        return datasets
 
 
 class ChartLabel:
@@ -73,6 +78,8 @@ class ChartLabel:
         return self.labels
 
 class Table:
+    max_table_rows = 10
+    max_table_cols = 5
     def __init__ (self, cols, rows):
         if not isinstance(cols, list):
             raise Exception("Cols can be list only.")
@@ -81,10 +88,14 @@ class Table:
         
         ## other validations if required.... 
 
-        self.cols = cols
-        self.rows = rows
+        self.cols = cols[0:self.max_table_cols]
+        self.rows = rows[0:self.max_table_rows]
         self.settings = {
-            "rowno":True
+            "rowno":True,
+            "displayheader":True,
+            "knowmoretext":"+"+str(len(rows)-len(self.rows))+" more rows",
+            "overflow":(len(rows)>len(self.rows)),
+            "height":200
         }
 
     def setSettings(self, settingsDict):
@@ -99,25 +110,30 @@ class Table:
         }
 
 class List:
-    def __init__ (self, listitems):
+    max_list_items = 10
+    def __init__ (self, listitemarr):
         self.listitems = []
+        
+        if listitemarr and isinstance(listitemarr, list):
+            for item in listitemarr[0:self.max_list_items]:
+                self.listitems.append(item.__dict__)
+        
         self.settings={
 			"type":"ordered",
 			"bullets":True,
-			"hasvalues":True
+			"hasvalues":True, 
+            "knowmoretext":"+"+str(len(listitemarr)-len(self.listitems))+" more rows",
+            "overflow":(len(listitemarr)>len(self.listitems)),
+            "height": 200
 		}
-
-        if listitems and isinstance(listitems, list):
-            for item in listitems:
-                self.listitems.append(item.__dict__)
-             
+        
     
     def setSettings(self, settingsDict):
         for setting in settingsDict:
             self.settings[setting] = settingsDict[setting]
     
     def generateListModelObject(self):
-        print ("Items:", self.listitems)
+        #print ("Items:", self.listitems)
         return {
             "listitems": self.listitems,
             "settings":self.settings
@@ -139,3 +155,18 @@ class SummaryValue:
 			"value":self.value
 		}
         
+class StatusField:
+    def __init__(self, label, color, status):
+        self.color = color
+        self.label = label
+        self.status = status
+        
+        if not self.color in ["red","green","orange","purple","darkgrey","black","yellow","lightblue", "blue"]:
+            raise Exception("You can only pass red,green,orange,purple,darkgrey,black,yellow,lightblue, blue as colors , you passed: "+str(self.color))
+    
+    def generateStatusfieldObject(self):
+        return {
+            "label": self.label,
+            "color":self.color,
+            "status":self.status
+        }

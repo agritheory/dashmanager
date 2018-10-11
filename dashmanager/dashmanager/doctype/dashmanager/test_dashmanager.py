@@ -13,4 +13,4 @@ class TestDashmanager(unittest.TestCase):
 		#fields = dashmanager.get_dashboard_components("Item")
 		fields = dashmanager.get_dashboard_components("Item","testfield")
 		# fields = dashmanager.get_dashmanager_components_settings()
-		print (fields)
+		#print (fields)
