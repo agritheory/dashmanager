@@ -3,19 +3,6 @@
         "public/js/dashboardtemplate.html", 
         "public/js/templates/barcharttemplate.html", 
         "public/js/templates/tabletemplate.html",
-        "public/js/templates/previewtemplate.html",
-        "public/js/lib/slickgrid/jquery.event.drag.js",
-		"public/js/lib/slickgrid/plugins/slick.cellrangedecorator.js",
-		"public/js/lib/slickgrid/plugins/slick.cellrangeselector.js",
-		"public/js/lib/slickgrid/plugins/slick.cellselectionmodel.js",
-		"public/js/lib/slickgrid/plugins/slick.cellexternalcopymanager.js",
-		"public/js/lib/slickgrid/slick.core.js",
-		"public/js/lib/slickgrid/slick.grid.js",
-		"public/js/lib/slickgrid/slick.dataview.js"
-    ],
-    "js/erpnext.min.css":[
-        "public/js/lib/slickgrid/slick.grid.css",
-		"public/js/lib/slickgrid/slick-default-theme.css",
-		"public/css/slickgrid.css"
+        "public/js/templates/previewtemplate.html"
     ]
 }

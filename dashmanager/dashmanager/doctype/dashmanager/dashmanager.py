@@ -88,19 +88,16 @@ class Dashmanager(Document):
 		# component type + dimensions (need templates for list, table, chart, status)
 
 	def build_dashboard_components(self):
-		##print("Printing Components")
 		components = []
-		#index = 0
 		rendered_htmls = []
 		boostrap_setting_dict = get_boostrap_settings()
 		
 		for index,component in enumerate(self.components):
-			print ("Cache : ")
 			dirty = True
 			nowDt = datetime.datetime.now()
 			nowTs = time.mktime(nowDt.timetuple())
+
 			if component.cache_this_components_query:
-				print("Yes")
 				timestamp_delta = self.syncTimes[component.cache_this_components_query]
 				print("Delta", timestamp_delta)
 				if self.components[index].last_cached:
@@ -134,23 +131,13 @@ class Dashmanager(Document):
 				print("NOTDIRTY")
 				rendered_html = component.cached_data
 			
-			rendered_htmls.append(rendered_html)
-			
-			# components.append({
-			# 	"title": component.component_title,
-			# 	"type": component.component_type,
-			# 	"data": self.getDataForComponent(component.component_type, component, self.ref_doctype, self.ref_docfield),
-			# 	"template":self.getTemplateForComponent(component.component_type, component, self.ref_doctype, self.ref_docfield),
-			# 	"domid":self.ref_docfield+"_"+str(index)
-			# })
-			#index+=1
+			rendered_htmls.append(rendered_html)			
 			self.components[index].last_cached = nowDt
 		## save the last cache time of each components....
 		self.save() 
 		return "".join(rendered_htmls)#components
 	
 	def getTemplateForComponent(self, type, component, ref_doctype, ref_docfield):
-		## TODO: to put a dict mapping instead of the lousy if...
 		if type=="Chart":
 			return "dashmanager/templates/barcharttemplate.html"
 		if type=="Table":
@@ -163,25 +150,18 @@ class Dashmanager(Document):
 			return "dashmanager/templates/statusfieldtemplate.html"
 
 	def getDataForComponent(self, type,component, ref_doctype, ref_docfield):
-		### todo: rendering of data based on type of component.
 		if type=="Chart":
-			return self.getChartData(component, ref_doctype, ref_docfield)
-		
+			return self.getChartData(component, ref_doctype, ref_docfield)		
 		if type=="Table":
 			return self.getTableData(component, ref_doctype, ref_docfield)
-		
 		if type=="List":
 			return self.getListData(component, ref_doctype, ref_docfield)
-		
 		if type=="Value":
 			return self.getValuesData(component, ref_doctype, ref_docfield)
-		
 		if type=="Status":
 			return self.getStatusData(component, ref_doctype, ref_docfield)
 	
 	def getDataFromDataSource(self, component, ref_doctype, ref_docfield, datasource, hook):
-		# if datasource == "Python Script":selec
-		# 	return self.getPythonScriptResult( component, ref_doctype, ref_docfield)
 		if datasource == "Hook":
 			return self.getTheHook(hook)
 		elif datasource == "SQL":
@@ -209,10 +189,6 @@ class Dashmanager(Document):
 					return self.convertSqlToWrapperObjects(component, data)	
 				else:
 					return self.convertSqlToWrapperObjects(component,self.getQueryResult(component.component_contents, component))
-		# else: 
-		# 	## temperory fail safe
-		# 	return self.getDataForComponent(type, component, ref_doctype, ref_docfield)
-		pass
 	
 	def convertSqlToWrapperObjects(self, component, data):
 		if component.component_type=="Chart":
@@ -227,7 +203,6 @@ class Dashmanager(Document):
 				else:
 					chartModel.addDataSets(ChartDataSet(row))
 			return chartModel	
-			# raise Exception("Not yet supported for SQL")
 		
 		if component.component_type=="Table":
 			table = Table(str(component.table_columns).splitlines(False), data)
@@ -259,29 +234,19 @@ class Dashmanager(Document):
 
 
 	def getChartData(self, component, ref_doctype, ref_docfield):
-		## here the data will come from SQL and not statically
 		chartModel = self.getDataFromDataSource(component, ref_doctype, ref_docfield, component.data_source,component.hook_name)
-		##print("Got Chart Model:", chartModel)
 		settings = {
 			"title": component.component_title,
 			"type": str(component.chart_type).lower(), ##// axis-mixed, or 'bar', 'line', 'pie', 'percentage'
 			"height": component.height if component.height and component.height > 0 else 300,
-			"colors": ['purple', '#ffa3ef', 'light-blue']
+			# "colors": ['purple', '#ffa3ef', 'light-blue']
 		}
 		chartModel.setSettings(settings)
 		return chartModel.generateChartModelObject()
 
 
-		# chartModel = ChartModel(settings)
-		# chartModel.setLabels(ChartLabel(["12am-3am", "3am-6am", "6am-9am", "9am-12pm","12pm-3pm", "3pm-6pm", "6pm-9pm", "9pm-12am"]))
-		# chartModel.addDataSets(ChartDataSet("Some Data 1", [25, 40, 30, 35, 8, 52, 17, -4],"bar"))
-		# chartModel.addDataSets(ChartDataSet("Some Data 1", [25, 50, -10, 15, 18, 32, 27, 14],"bar"))
-		# chartModel.addDataSets(ChartDataSet("Some Data 1", [15, 20, -3, -15, 58, 12, -17, 37],"bar"))
-
 	def getTableData(self, component, ref_doctype, ref_docfield):
-		## here the data will come from SQL and not statically
 		table = self.getDataFromDataSource(component,ref_doctype, ref_docfield, component.data_source, component.hook_name)
-		#return Table(str(component.table_columns).splitlines(False), table).generateTableModelObject()
 		table.setSettings({"height":component.height if component.height and component.height > 0 else 200})
 		return table.generateTableModelObject()
 	
@@ -345,16 +310,21 @@ def get_dashboard(doctype, active_document):
 
 @frappe.whitelist()
 def get_dashboard_components(doctype, field):
+	"""
+	for a given dashboard and fields, there will be a single dashmanager record.
+	"""
+
 	dashs = frappe.get_all("Dashmanager", filters={"ref_doctype": doctype,"ref_docfield":doctype+"-"+field})
-	## for a given dashboard and fields, there will be a single dashmanager record.
-	##print("Dashs:",dashs)
 	dash = frappe.get_doc("Dashmanager", dashs[0])
 	return dash.build_dashboard_components()
 
 @frappe.whitelist()
 def get_dashmanager_docs():
-	#### this should return all the documents for which the dashmanager has a registered component.	
-	## getting all doctypes from all dashmanagers
+	"""
+	this will return all the documents for which the dashmanager has a registered component.	
+	getting all doctypes from all dashmanagers
+	"""
+
 	ref_docs = get_registered_docs_for_dashmanager()
 	return {
 		"ref_docs" : json.dumps(ref_docs)
@@ -370,7 +340,9 @@ def get_registered_docs_for_dashmanager():
 
 @frappe.whitelist()
 def get_dashmanager_field_components(doctype):
-	## get list of fields and components for given doc type
+	"""	
+	get list of fields and components for given doc type
+	"""
 	fields_list, fields_component_list = get_fields_component_list(doctype)
 	return {
 		"fields" : json.dumps(fields_list),
