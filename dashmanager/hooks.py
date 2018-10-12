@@ -132,5 +132,6 @@ dashmanager_renders={
     "status_hooks1":"dashmanager.dashmanager.test_hook_file.status_hooks1",
     "status_hooks2":"dashmanager.dashmanager.test_hook_file.status_hooks2",
     "status_hooks3":"dashmanager.dashmanager.test_hook_file.status_hooks3",
-    "status_hooks4":"dashmanager.dashmanager.test_hook_file.status_hooks4"
+    "status_hooks4":"dashmanager.dashmanager.test_hook_file.status_hooks4",
+    "list_status_hook":"dashmanager.dashmanager.test_hook_file.list_status_hook"
 }

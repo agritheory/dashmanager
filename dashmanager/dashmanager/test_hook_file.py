@@ -43,6 +43,19 @@ def chart_hook():
     chartModel.addDataSets(ChartDataSet( [15, 20, -3, -15, 58, 12, -17, 37],"Marketing"))
     return chartModel
 
+def list_status_hook():
+    list_arr = [ListItem("Items","In Stock","green"), ListItem("Warehouse","Connected","blue"), ListItem("Plant 1","Live","green"), ListItem("Plant 2","Shutdown","red"), ListItem("Plant 3","Maintenance","orange")]
+    list = List(list_arr)
+    settings = {
+        "type":"ordered",
+        "bullets":False,
+        "hasvalues":True,
+        "indicator":True
+
+    }
+    list.setSettings(settings)
+    return list
+
 def status_hooks1():
     return StatusField("Comm Check", "green","LIVE")
 

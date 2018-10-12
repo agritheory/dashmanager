@@ -3,7 +3,7 @@
         <div><b>{{component.title}}</b></div>
         <{{ 'ol' if component.data.settings.type=='ordered' else 'ul' }} style="width:100%;margin-top:10px;{%if not component.data.settings.bullets %}list-style-type:none; {%endif%}">
             {% for item in component.data.listitems %}
-            <li><span>{{item.item}}</span>{%if component.data.settings.hasvalues%}<span style="float:right">{{item.value}}</span>{%
+            <li><span {%if component.data.settings.indicator%} class="indicator {{item.color}}"{%endif%}>{{item.item}}</span>{%if component.data.settings.hasvalues%}<span style="float:right">{{item.value}}</span>{%
                         endif %}</li>
             {% endfor %}
         </{{ 'ol' if component.data.settings.type=='ordered' else 'ul' }}>

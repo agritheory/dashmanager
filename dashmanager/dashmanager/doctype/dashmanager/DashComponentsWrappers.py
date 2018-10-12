@@ -124,7 +124,8 @@ class List:
 			"hasvalues":True, 
             "knowmoretext":"+"+str(len(listitemarr)-len(self.listitems))+" more rows",
             "overflow":(len(listitemarr)>len(self.listitems)),
-            "height": 200
+            "height": 200,
+            "indicator":False
 		}
         
     
@@ -140,9 +141,13 @@ class List:
         }
 
 class ListItem:
-    def __init__ (self, item, value):
+    def __init__ (self, item, value, color=None):
         self.item = item
         self.value = value
+        self.color = color
+        if color:
+            if not self.color in ["red","green","orange","purple","darkgrey","black","yellow","lightblue", "blue"]:
+                raise Exception("You can only pass red,green,orange,purple,darkgrey,black,yellow,lightblue, blue as colors , you passed: "+str(self.color))
 
 class SummaryValue:
     def __init__ (self, value, caption):
