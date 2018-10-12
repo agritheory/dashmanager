@@ -12,7 +12,7 @@ console.log("Dashmanager");
 /// fire a call each time this script loads to get all registered docs types fo dash manager so that we have 
 /// a on load hook in form component of respective doc type.
 
-//registerDocs()
+registerDocs()
 
 
 function registerDocs() {
