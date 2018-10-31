@@ -123,15 +123,12 @@ app_include_js = "/assets/dashmanager/js/dashmanager.js"
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "dashmanager.event.get_events"
 # }
-dashmanager_renders={
-    "hook1":"dashmanager.dashmanager.test_hook_file.test_hook",
-    "summary_value_one":"dashmanager.dashmanager.test_hook_file.summary_value_one",
-    "summary_value_two":"dashmanager.dashmanager.test_hook_file.summary_value_two",
-    "summary_value_three":"dashmanager.dashmanager.test_hook_file.summary_value_three",
-    "chart_hook":"dashmanager.dashmanager.test_hook_file.chart_hook",
-    "status_hooks1":"dashmanager.dashmanager.test_hook_file.status_hooks1",
-    "status_hooks2":"dashmanager.dashmanager.test_hook_file.status_hooks2",
-    "status_hooks3":"dashmanager.dashmanager.test_hook_file.status_hooks3",
-    "status_hooks4":"dashmanager.dashmanager.test_hook_file.status_hooks4",
-    "list_status_hook":"dashmanager.dashmanager.test_hook_file.list_status_hook"
+dashmanager_renders = {
+    "item_sales_last_30": "dashmanager.utils.item_sales_last_30",
+    "item_sales_last_60": "dashmanager.utils.item_sales_last_30",
+    "item_sales_ytd": "dashmanager.utils.item_sales_ytd",
+    "total_open_purchase_orders": "dashmanager.utils.total_open_purchase_orders",
+    "returns_ytd": "dashmanager.utils.returns_ytd",
+    "days_of_inventory_28": "dashmanager.utils.days_of_inventory_28",
+    "inventory_turns": "dashmanager.utils.inventory_turns"
 }
