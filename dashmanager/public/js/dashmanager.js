@@ -16,6 +16,23 @@ class Dashmanager {
 var dashmanager = new Dashmanager();
 registerDocs(dashmanager);
 
+// $(document).ready(function() {
+//
+// 	console.log(frappe.modules_page);
+// 	$.extend(frappe.modules_page, {
+// 		set title(val) {
+// 	      this._title = val;
+// 	      this._onPropertyChanged('title', val);
+// 	  },
+//
+// 		_onPropertyChanged(propName, val) {
+// 	        alert(val);
+// 	  }
+//
+// 	});
+//
+// });
+
 
 function registerDocs(dashmanager) {
 	frappe.call({
@@ -196,9 +213,5 @@ function handleDSM() {
 }
 
 frappe.route.on("change", () => {
-	injectPageDash();
-});
-
-frappe.route.on("app_ready", () => {
 	injectPageDash();
 });

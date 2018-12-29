@@ -124,11 +124,14 @@ app_include_js = "/assets/dashmanager/js/dashmanager.js"
 # 	"frappe.desk.doctype.event.event.get_events": "dashmanager.event.get_events"
 # }
 dashmanager_renders = {
-    "item_sales_last_30": "dashmanager.utils.item_sales_last_30",
-    "item_sales_last_60": "dashmanager.utils.item_sales_last_30",
-    "item_sales_ytd": "dashmanager.utils.item_sales_ytd",
-    "total_open_purchase_orders": "dashmanager.utils.total_open_purchase_orders",
-    "returns_ytd": "dashmanager.utils.returns_ytd",
-    "days_of_inventory_28": "dashmanager.utils.days_of_inventory_28",
-    "inventory_turns": "dashmanager.utils.inventory_turns"
+    "Item Sales Last 30": "dashmanager.utils.item_sales_last_30",
+    "Item Sales Last 60": "dashmanager.utils.item_sales_last_30",
+    "Item Sales YTD": "dashmanager.utils.item_sales_ytd",
+    "Total Open Purchase Orders": "dashmanager.utils.total_open_purchase_orders",
+    "Returns YTD": "dashmanager.utils.returns_ytd",
+    "Days of Inventory (28)": "dashmanager.utils.days_of_inventory_28",
+    "Inventory Turns": "dashmanager.utils.inventory_turns",
+    "Open POs": "dashmanager.utils.open_po_list",
+    "Sales Last 90": "dashmanager.utils.sales_last_90",
+    "Sales Last 365": "dashmanager.utils.sales_last_365",
 }

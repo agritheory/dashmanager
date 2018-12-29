@@ -17,10 +17,9 @@ def zero_currency(amount):
 
 
 # Hook Methods for Item Doctype
-"""
-Returns the last sales of Item X for in last 30 calendar days
-"""
+
 def item_sales_last_30(doc):
+	"""	Returns the last sales of Item X for in last 30 calendar days """
 	return zero_currency(frappe.db.sql("""
 	SELECT SUM(net_amount) as net_amount
 	FROM `tabSales Order Item`
@@ -30,10 +29,9 @@ def item_sales_last_30(doc):
 	"after": datetime.date.today() - datetime.timedelta(days=31)},
 		as_dict=True)[0]["net_amount"])
 
-"""
-Returns the quantity of Item X sold in last 30 calendar days
-"""
+
 def item_qty_last_30(doc):
+	""" Returns the quantity of Item X sold in last 30 calendar days """
 	return int(frappe.db.sql("""
 	SELECT SUM(qty) as qty
 	FROM `tabSales Order Item`
@@ -44,10 +42,9 @@ def item_qty_last_30(doc):
 		as_dict=True)[0]["qty"])
 
 
-"""
-Returns the last sales of Item X for in last 60 calendar days
-"""
+
 def item_sales_last_60(doc):
+	""" Returns summary value of Item X for in last 60 calendar days """
 	return zero_currency(frappe.db.sql("""
 	SELECT SUM(net_amount) as net_amount
 	FROM `tabSales Order Item`
@@ -58,6 +55,7 @@ def item_sales_last_60(doc):
 		as_dict=True)[0]["net_amount"])
 
 def item_sales_last_365(doc):
+	""" Returns the last sales of Item X for in last 365 calendar days """
 	return zero_currency(frappe.db.sql("""
 	SELECT SUM(net_amount) as net_amount
 	FROM `tabSales Order Item`
@@ -67,10 +65,9 @@ def item_sales_last_365(doc):
 	"after": datetime.date.today() - datetime.timedelta(days=365)},
 		as_dict=True)[0]["net_amount"])
 
-"""
-Returns the sales of Item X since begingging of fiscal year
-"""
+
 def item_sales_ytd(doc):
+	""" Returns the sales of Item X since begingging of fiscal year """
 	from erpnext.accounts.utils import get_fiscal_year
 	return zero_currency(frappe.db.sql("""
 	SELECT SUM(net_amount) as net_amount
@@ -81,10 +78,9 @@ def item_sales_ytd(doc):
 	"after": get_fiscal_year(datetime.date.today())[1]},
 		as_dict=True)[0]["net_amount"])
 
-"""
-Totals all purchase orders of Item X before today
-"""
+
 def total_open_purchase_orders(doc):
+	""" Totals all purchase orders of Item X before today """
 	return zero_currency(frappe.db.sql("""
 	SELECT SUM(`tabPurchase Order Item.net_amount`) as net_amount,
 	FROM `tabPurchase Order Item`
@@ -93,10 +89,9 @@ def total_open_purchase_orders(doc):
 	""", {"doc": doc,
 	"after": datetime.date(datetime.date.today().year, 1, 1)}, as_dict=True))
 
-"""
-Returns quantity of returns start since fiscal year start
-"""
+
 def returns_ytd(doc):
+	""" Returns quantity of returns start since fiscal year start """
 	from erpnext.accounts.utils import get_fiscal_year
 	return int(frappe.db.sql("""
 	SELECT SUM(qty) as qty
@@ -107,10 +102,9 @@ def returns_ytd(doc):
 	""", {"doc": doc, "after": get_fiscal_year(datetime.date.today())[1],
 	"before": datetime.date.today()}, as_dict=True))
 
-"""
-Returns quantity of item sold in the last 28 days (per day), divided by current inventory balance
-"""
+
 def days_of_inventory_28(doc):
+	""" Returns quantity of item sold in the last 28 days (per day), divided by current inventory balance """
 	from erpnext.stock.utils import get_stock_balance
 	sales = float(frappe.db.sql("""
 	SELECT SUM(qty) as item_qty_last_30
@@ -124,10 +118,9 @@ def days_of_inventory_28(doc):
 	return sales / reduce(get_stock_balance(doc, warehouses))
 
 
-"""
-Returns average inventory level per day
-"""
+
 def inventory_turns(doc):
+	""" Returns average inventory level per day	"""
 	last_year = datetime.date.today().replace(year=datetime.date.today().year - 1)
 	stock_ledger_entries = frappe.db.sql("""
 		SELECT item_code, stock_value, name, warehouse
